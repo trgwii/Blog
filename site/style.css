@@ -1,0 +1,41 @@
+:root {
+	/* Variables */
+	--dark: #181a1b;
+	--gray: #736b5e;
+	--light: #e8e6e3;
+}
+
+/* Global rules */
+html, body, input, textarea, select, button {
+	background: var(--dark) !important;
+	color: var(--light) !important;
+	border-color: var(--gray) !important;
+	font-family: '{bodyFont}', Verdana, Geneva, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: '{titleFont}', Verdana, Geneva, sans-serif;
+}
+a {
+	color: var(--light) !important;
+}
+
+@media (prefers-color-scheme: light) {
+	html, body, input, textarea, select, button {
+		background: var(--light) !important;
+		color: var(--dark) !important;
+	}
+
+	a {
+		color: var(--dark) !important;
+	}
+}
+
+body {
+	margin: 30px auto;
+	max-width: 1200px;
+}
+
+main {
+	margin: auto 30px;
+}
