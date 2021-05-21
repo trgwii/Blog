@@ -1,4 +1,5 @@
 import marked from "./marked.ts";
+import { toFileUrl } from "https://deno.land/std@0.97.0/path/mod.ts";
 
 export const useTemplate = (
   str: string,
@@ -38,7 +39,10 @@ export const findTitle = (md: string, name: string) => {
   return capitalize(name);
 };
 
-export const findGlobals = async (dir: string) => {
+export const findGlobals = async (
+  dir: string,
+  count = 0,
+): Promise<Record<string, string | unknown>> => {
   const lower = `${dir}/_globals.ts`;
   const upper = `${dir}/../_globals.ts`;
   if (
@@ -47,9 +51,9 @@ export const findGlobals = async (dir: string) => {
       () => false,
     )
   ) {
-    return import(`./${lower}`).catch(() => ({}));
+    return import(`${toFileUrl(Deno.cwd())}/${lower}`).catch(() => ({}));
   }
-  return import(`./${upper}`).catch(() => ({}));
+  return import(`${toFileUrl(Deno.cwd())}/${upper}`).catch(() => ({}));
 };
 
 export const findTemplate = async (dir: string, name: string) => {
