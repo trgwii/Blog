@@ -13,7 +13,7 @@ if (typeof output !== "string") {
 
 console.log("rebuilding...");
 await generate(input, output);
-console.log("done");
+console.log("done!");
 
 Deno.run({
   cmd: [
@@ -25,11 +25,12 @@ Deno.run({
   ],
 });
 
-for await (const event of Deno.watchFs(input, { recursive: true })) {
+for await (const _event of Deno.watchFs(input, { recursive: true })) {
+  const start = Date.now();
   try {
     console.log("rebuilding...");
-    generate(input, output);
-    console.log("done!");
+    await generate(input, output);
+    console.log("done! (" + (Date.now() - start) + "ms)");
   } catch (err) {
     console.error(err.message);
   }

@@ -41,7 +41,6 @@ export const findTitle = (md: string, name: string) => {
 
 export const findGlobals = async (
   dir: string,
-  count = 0,
 ): Promise<Record<string, string | unknown>> => {
   const lower = `${dir}/_globals.ts`;
   const upper = `${dir}/../_globals.ts`;
@@ -91,7 +90,7 @@ const fns = {
             const x = d.split(".").slice(0, -1).join(".");
             return `[${x}](${x}/)`;
           })
-          .join("\n"),
+          .join("\n\n"),
         data,
         fns,
         dir,

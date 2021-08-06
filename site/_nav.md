@@ -1,4 +1,3 @@
-[Home](/)
-[Pages](/pages/)
-[Articles](/articles/)
+[Home](/) [Pages](/pages/) [Articles](/articles/)
+
 ---
