@@ -1,7 +1,6 @@
 import marked from "./marked.ts";
-import { toFileUrl } from "https://deno.land/std@0.97.0/path/mod.ts";
-
-import { replaceAsync } from "https://gist.githubusercontent.com/MKRhere/a6eb0bc813f0888c6bc48a4b433aed6d/raw/26bb84186d683b22cfd13a8df1d9faac06a1a697/replaceAsyncParallel.ts";
+import { replaceAsync } from "./replaceAsync.ts";
+import { toFileUrl } from "https://deno.land/std@0.103.0/path/mod.ts";
 
 const collect = async <T>(s: AsyncIterable<T>) => {
   const res = [];
