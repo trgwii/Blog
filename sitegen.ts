@@ -1,19 +1,29 @@
 import marked from "./marked.ts";
 import { toFileUrl } from "https://deno.land/std@0.97.0/path/mod.ts";
 
+import { replaceAsync } from "https://gist.githubusercontent.com/MKRhere/a6eb0bc813f0888c6bc48a4b433aed6d/raw/26bb84186d683b22cfd13a8df1d9faac06a1a697/replaceAsyncParallel.ts";
+
+const collect = async <T>(s: AsyncIterable<T>) => {
+  const res = [];
+  for await (const x of s) {
+    res.push(x);
+  }
+  return res;
+};
+
 export const useTemplate = (
   str: string,
   data: Record<string, string>,
   fns: Record<
     string,
-    (arg: string, dir: string, data: Record<string, string>) => string
+    (arg: string, dir: string, data: Record<string, string>) => Promise<string>
   >,
   dir: string,
 ) =>
-  str.replace(/\{(\w+:?[^}]+?)\}/g, (_, name) => {
+  replaceAsync(str, /\{(\w+:?[^}]+?)\}/g, async (_: unknown, name: string) => {
     const [f, arg] = name.split(":");
     if (arg && f in fns) {
-      return fns[f](arg, dir, data);
+      return await fns[f](arg, dir, data);
     }
     return name in data ? data[name] : `{${name}}`;
   });
@@ -71,20 +81,32 @@ export const findTemplate = async (dir: string, name: string) => {
 };
 
 const fns = {
-  md: (
+  md: async (
     file: string,
     dir: string,
     data: Record<string, string>,
   ) =>
-    marked(useTemplate(Deno.readTextFileSync(`${dir}/${file}`), data, fns, dir))
-      .trim(),
-  file: (file: string, dir: string, data: Record<string, string>) =>
-    useTemplate(Deno.readTextFileSync(`${dir}/${file}`), data, fns, dir)
-      .trim(),
-  dir: (arg: string, dir: string, data: Record<string, string>) =>
     marked(
-      useTemplate(
-        [...Deno.readDirSync(`${dir}/${arg}`)].map((d) => d.name)
+      await useTemplate(
+        await Deno.readTextFile(`${dir}/${file}`),
+        data,
+        fns,
+        dir,
+      ),
+    )
+      .trim(),
+  file: async (file: string, dir: string, data: Record<string, string>) =>
+    (await useTemplate(
+      await Deno.readTextFile(`${dir}/${file}`),
+      data,
+      fns,
+      dir,
+    ))
+      .trim(),
+  dir: async (arg: string, dir: string, data: Record<string, string>) =>
+    marked(
+      await useTemplate(
+        (await collect(Deno.readDir(`${dir}/${arg}`))).map((d) => d.name)
           .filter((x) => !x.startsWith("index."))
           .map((d) => {
             const x = d.split(".").slice(0, -1).join(".");
@@ -111,7 +133,7 @@ export const generate = async (input: string, output: string) => {
         const md = await Deno.readTextFile(entPath);
         const [templateDir, template] = await findTemplate(input, noExt);
         const globals = await findGlobals(input);
-        const processedMd = useTemplate(
+        const processedMd = await useTemplate(
           md,
           {
             ...globals,
@@ -121,7 +143,7 @@ export const generate = async (input: string, output: string) => {
           input,
         );
         const title = findTitle(processedMd, noExt);
-        const result = useTemplate(
+        const result = await useTemplate(
           template,
           {
             ...globals,
@@ -139,7 +161,7 @@ export const generate = async (input: string, output: string) => {
       if (name.endsWith(".html")) {
         const file = await Deno.readTextFile(entPath);
         const globals = await findGlobals(input);
-        const doc = useTemplate(
+        const doc = await useTemplate(
           file,
           {
             ...globals,
@@ -154,7 +176,7 @@ export const generate = async (input: string, output: string) => {
       if (name.endsWith(".css")) {
         const file = await Deno.readTextFile(entPath);
         const globals = await findGlobals(input);
-        const sheet = useTemplate(
+        const sheet = await useTemplate(
           file,
           {
             ...globals,
