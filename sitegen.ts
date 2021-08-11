@@ -1,6 +1,6 @@
 import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
-import { toFileUrl } from "https://deno.land/std@0.103.0/path/mod.ts";
+import { toFileUrl } from "https://deno.land/std@0.104.0/path/mod.ts";
 import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
 
 const collect = async <T>(s: AsyncIterable<T>) => {
