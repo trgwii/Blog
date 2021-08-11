@@ -141,85 +141,89 @@ const fns = {
     ),
 };
 export const generate = async (input: string, output: string) => {
+  const p: Promise<void>[] = [];
   for await (const entry of Deno.readDir(input)) {
-    const { name } = entry;
-    const noExt = name.split(".").slice(0, -1).join(".");
-    const entPath = `${input}/${name}`;
-    const stat = await Deno.stat(entPath);
-    if (stat.isFile) {
-      if (name.startsWith("_")) {
-        continue;
-      }
-      if (name.endsWith(".md")) {
-        const md = await Deno.readTextFile(entPath);
-        const [templateDir, template] = await findTemplate(input, noExt);
-        const globals = await findGlobals(input);
-        const processedMd = await useTemplate(
-          md,
-          {
-            ...globals,
-            title: capitalize(noExt),
-          },
-          fns,
-          input,
-        );
-        const title = findTitle(processedMd, noExt);
-        const result = await useTemplate(
-          template,
-          {
-            ...globals,
-            title,
-            body: marked(processedMd).trim(),
-          },
-          fns,
-          templateDir.split("/").pop()?.includes(".")
-            ? templateDir.split("/").slice(0, -1).join("/")
-            : templateDir,
-        );
-        await writeDocument(`${output}/${noExt}`, result);
-        continue;
-      }
-      if (name.endsWith(".html")) {
-        const file = await Deno.readTextFile(entPath);
-        const globals = await findGlobals(input);
-        const doc = await useTemplate(
-          file,
-          {
-            ...globals,
-            title: capitalize(noExt),
-          },
-          fns,
-          input,
-        );
-        await writeDocument(`${output}/${noExt}`, doc);
-        continue;
-      }
-      if (name.endsWith(".css")) {
-        const file = await Deno.readTextFile(entPath);
-        const globals = await findGlobals(input);
-        const sheet = await useTemplate(
-          file,
-          {
-            ...globals,
-            title: capitalize(noExt),
-          },
-          fns,
-          input,
-        );
+    p.push((async () => {
+      const { name } = entry;
+      const noExt = name.split(".").slice(0, -1).join(".");
+      const entPath = `${input}/${name}`;
+      const stat = await Deno.stat(entPath);
+      if (stat.isFile) {
+        if (name.startsWith("_")) {
+          return;
+        }
+        if (name.endsWith(".md")) {
+          const md = await Deno.readTextFile(entPath);
+          const [templateDir, template] = await findTemplate(input, noExt);
+          const globals = await findGlobals(input);
+          const processedMd = await useTemplate(
+            md,
+            {
+              ...globals,
+              title: capitalize(noExt),
+            },
+            fns,
+            input,
+          );
+          const title = findTitle(processedMd, noExt);
+          const result = await useTemplate(
+            template,
+            {
+              ...globals,
+              title,
+              body: marked(processedMd).trim(),
+            },
+            fns,
+            templateDir.split("/").pop()?.includes(".")
+              ? templateDir.split("/").slice(0, -1).join("/")
+              : templateDir,
+          );
+          await writeDocument(`${output}/${noExt}`, result);
+          return;
+        }
+        if (name.endsWith(".html")) {
+          const file = await Deno.readTextFile(entPath);
+          const globals = await findGlobals(input);
+          const doc = await useTemplate(
+            file,
+            {
+              ...globals,
+              title: capitalize(noExt),
+            },
+            fns,
+            input,
+          );
+          await writeDocument(`${output}/${noExt}`, doc);
+          return;
+        }
+        if (name.endsWith(".css")) {
+          const file = await Deno.readTextFile(entPath);
+          const globals = await findGlobals(input);
+          const sheet = await useTemplate(
+            file,
+            {
+              ...globals,
+              title: capitalize(noExt),
+            },
+            fns,
+            input,
+          );
+          await Deno.mkdir(output, { recursive: true }).catch(() => {});
+          await Deno.writeTextFile(`${output}/${name}`, sheet);
+          return;
+        }
         await Deno.mkdir(output, { recursive: true }).catch(() => {});
-        await Deno.writeTextFile(`${output}/${name}`, sheet);
-        continue;
+        await Deno.copyFile(entPath, `${output}/${name}`)
+          .catch((err: Error) => console.error(err.message));
+      } else if (stat.isDirectory) {
+        if (name.startsWith("_")) {
+          return;
+        }
+        await generate(entPath, `${output}/${name}`);
       }
-      await Deno.mkdir(output, { recursive: true }).catch(() => {});
-      await Deno.copyFile(entPath, `${output}/${name}`)
-        .catch((err: Error) => console.error(err.message));
-    } else if (stat.isDirectory) {
-      if (name.startsWith("_")) {
-        continue;
-      }
-      await generate(entPath, `${output}/${name}`);
-    }
+    })());
   }
+  await Promise.all(p);
 };
 
 if (import.meta.main) {

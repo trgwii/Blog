@@ -20,7 +20,7 @@ Deno.run({
     "deno",
     "run",
     "-A",
-    "https://deno.land/std@0.90.0/http/file_server.ts",
+    "https://deno.land/std@0.104.0/http/file_server.ts",
     output,
   ],
 });
