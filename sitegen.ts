@@ -22,7 +22,7 @@ export const useTemplate = (
 ) =>
   replaceAsync(str, /\{(\w+:?[^}]+?)\}/g, async (_: unknown, name: string) => {
     const [f, ...args] = name.split(":");
-    const arg = args.join(':');
+    const arg = args.join(":");
     if (arg && f in fns) {
       return await fns[f](arg, dir, data);
     }
@@ -109,6 +109,20 @@ const fns = {
     const contentType = res.headers.get("Content-Type") ??
       "application/octet-stream";
     return `data:${contentType};base64,${encode(await res.arrayBuffer())}`;
+  },
+  favicon: async (url: string) => {
+    if (url.startsWith("<") && url.endsWith(">")) {
+      url = url.slice(1, -1);
+    }
+    const res = await fetch(url);
+    const html = await res.text();
+    const faviconURL = html.match(
+      /<link[^>]*?rel="[^-"]*?icon[^"]*?"[^>]*href="([^"]*?)"/,
+    )?.[1];
+    const faviconAbsURL = new URL(faviconURL ?? "/favicon.ico", url).href;
+    return `![16px ${
+      capitalize(new URL(url).hostname.split(".")[0])
+    } logo](${await fns.dataURL(faviconAbsURL)})`;
   },
   dir: async (arg: string, dir: string, data: Record<string, string>) =>
     marked(

@@ -40,7 +40,7 @@ main {
 	margin: auto 30px;
 }
 
-img[alt="icon-16px"] {
+img[alt^="16px"] {
 	max-width: 16px;
 	max-height: 16px;
 }
