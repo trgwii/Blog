@@ -1,6 +1,7 @@
 import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
 import { toFileUrl } from "https://deno.land/std@0.103.0/path/mod.ts";
+import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
 
 const collect = async <T>(s: AsyncIterable<T>) => {
   const res = [];
@@ -20,7 +21,8 @@ export const useTemplate = (
   dir: string,
 ) =>
   replaceAsync(str, /\{(\w+:?[^}]+?)\}/g, async (_: unknown, name: string) => {
-    const [f, arg] = name.split(":");
+    const [f, ...args] = name.split(":");
+    const arg = args.join(':');
     if (arg && f in fns) {
       return await fns[f](arg, dir, data);
     }
@@ -102,6 +104,12 @@ const fns = {
       dir,
     ))
       .trim(),
+  dataURL: async (url: string) => {
+    const res = await fetch(url);
+    const contentType = res.headers.get("Content-Type") ??
+      "application/octet-stream";
+    return `data:${contentType};base64,${encode(await res.arrayBuffer())}`;
+  },
   dir: async (arg: string, dir: string, data: Record<string, string>) =>
     marked(
       await useTemplate(
