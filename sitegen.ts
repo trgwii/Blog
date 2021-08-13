@@ -2,6 +2,7 @@ import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
 import { toFileUrl } from "https://deno.land/std@0.104.0/path/mod.ts";
 import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
+import { parse } from "https://deno.land/x/frontmatter@v0.1.2/mod.ts";
 
 const collect = async <T>(s: AsyncIterable<T>) => {
   const res = [];
@@ -20,14 +21,18 @@ export const useTemplate = (
   >,
   dir: string,
 ) =>
-  replaceAsync(str, /\{(\w+:?[^}]+?)\}/g, async (_: unknown, name: string) => {
-    const [f, ...args] = name.split(":");
-    const arg = args.join(":");
-    if (arg && f in fns) {
-      return await fns[f](arg, dir, data);
-    }
-    return name in data ? data[name] : `{${name}}`;
-  });
+  replaceAsync(
+    str,
+    /\{([\w|?]+:?[^}]+?)\}/g,
+    async (_: unknown, name: string) => {
+      const [f, ...args] = name.split(":");
+      const arg = args.join(":");
+      if (arg && f in fns) {
+        return await fns[f](arg, dir, data);
+      }
+      return name in data ? data[name] : `{${name}}`;
+    },
+  );
 
 export const writeDocument = async (name: string, data: string) => {
   if (name.endsWith("index")) {
@@ -81,21 +86,33 @@ export const findTemplate = async (dir: string, name: string) => {
   return [upper, await Deno.readTextFile(upper)];
 };
 
+const Str = (x: unknown) => {
+  if (x instanceof Date) return x.toISOString().split("T")[0];
+  return String(x);
+};
+
 const fns = {
   md: async (
     file: string,
     dir: string,
     data: Record<string, string>,
-  ) =>
-    marked(
+  ) => {
+    const doc = await Deno.readTextFile(`${dir}/${file}`);
+    const { data: locals = {}, content } = parse(doc);
+    return marked(
       await useTemplate(
-        await Deno.readTextFile(`${dir}/${file}`),
-        data,
+        content,
+        { ...data, ...locals as Record<string, string> },
         fns,
         dir,
       ),
-    )
-      .trim(),
+    ).trim();
+  },
+  "?": (str: string, _: string, data: Record<string, string>) => {
+    const [x, ...rest] = str.split(":");
+    const r = rest.join(":");
+    return Promise.resolve(x in data ? r.replaceAll(x, Str(data[x])) : "");
+  },
   file: async (file: string, dir: string, data: Record<string, string>) =>
     (await useTemplate(
       await Deno.readTextFile(`${dir}/${file}`),
@@ -156,22 +173,26 @@ export const generate = async (input: string, output: string) => {
           const md = await Deno.readTextFile(entPath);
           const [templateDir, template] = await findTemplate(input, noExt);
           const globals = await findGlobals(input);
+          const { data: _locals = {} } = parse(md);
           const processedMd = await useTemplate(
             md,
             {
               ...globals,
               title: capitalize(noExt),
+              ..._locals as Record<string, string>,
             },
             fns,
             input,
           );
           const title = findTitle(processedMd, noExt);
+          const { data: locals = {}, content } = parse(processedMd);
           const result = await useTemplate(
             template,
             {
               ...globals,
               title,
-              body: marked(processedMd).trim(),
+              ...locals as Record<string, string>,
+              body: marked(content).trim(),
             },
             fns,
             templateDir.split("/").pop()?.includes(".")
