@@ -1,3 +1,7 @@
+---
+author: Thomas
+---
+
 {md:../_nav.md}
 
 # TypeScript is cool
