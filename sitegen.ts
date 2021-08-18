@@ -250,7 +250,7 @@ export const generate = async (input: string, output: string) => {
           await writeDocument(`${output}/${noExt}`, doc);
           return;
         }
-        if (name.endsWith(".css")) {
+        if (name.endsWith(".css") || name.endsWith(".js")) {
           const file = await Deno.readTextFile(entPath);
           const globals = await findGlobals(input);
           const sheet = await useTemplate(

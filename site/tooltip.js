@@ -2,7 +2,7 @@ const tooltip = document.createElement("div");
 Object.assign(tooltip.style, {
   position: "absolute",
   display: "none",
-  fontFamily: "'Inconsolata', monospace",
+  fontFamily: "'{codeFont}', monospace",
   fontSize: "14px",
   backgroundColor: "#1E1E1E",
   border: "1px solid #727272",
