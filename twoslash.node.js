@@ -1,11 +1,11 @@
 ///<reference types="./node_modules/@types/node/index.d.ts" />
 ///<reference types="./node_modules/shiki-twoslash/dist/index.d.ts" />
 
-import {
+const {
   createShikiHighlighter,
   renderCodeToHTML,
   runTwoSlash,
-} from "shiki-twoslash";
+} = require("shiki-twoslash");
 
 (async () => {
   let code = "";

@@ -13,7 +13,7 @@ const markedOpts: marked.MarkedOptions = {
   ) => {
     (async () => {
       const proc = Deno.run({
-        cmd: ["node", "twoslash.mjs", lang],
+        cmd: ["node", "twoslash.node.js", lang],
         stdin: "piped",
         stdout: "piped",
         stderr: "piped",
