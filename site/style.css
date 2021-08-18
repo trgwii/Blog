@@ -44,3 +44,16 @@ img[alt^="16px"] {
 	max-width: 16px;
 	max-height: 16px;
 }
+
+pre > code {
+	font-family: '{codeFont}', monospace;
+	font-size: 14px;
+}
+
+data-lsp {
+	border-bottom: 1px dotted #D4D4D4;
+}
+
+.language-id {
+	display: none;
+}

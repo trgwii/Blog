@@ -2,11 +2,9 @@
 author: Thomas
 ---
 
-{md:../_nav.md}
-
 # TypeScript is cool
 
-```typescript
+```ts
 type Join<T extends unknown[], D extends string> = T extends [] ? ""
   : T extends [string | number | boolean | bigint] ? `${T[0]}`
   : T extends [string | number | boolean | bigint, ...infer U]
@@ -28,5 +26,3 @@ type T43 = Split<any, ".">; // string[]
 ```
 
 Yep. TS can do that now.
-
-{file:../_util/monaco.html}

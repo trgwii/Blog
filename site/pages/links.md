@@ -1,5 +1,3 @@
-{md:../_nav.md}
-
 # Links
 
 {favicon:<https://github.com/>} [GitHub](https://github.com/trgwii)

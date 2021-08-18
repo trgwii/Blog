@@ -1,8 +1,39 @@
+import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
+import { toFileUrl } from "https://deno.land/std@0.104.0/path/mod.ts";
+import { writeAll } from "https://deno.land/std@0.105.0/io/util.ts";
+import { parse } from "https://deno.land/x/frontmatter@v0.1.2/mod.ts";
 import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
-import { toFileUrl } from "https://deno.land/std@0.104.0/path/mod.ts";
-import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
-import { parse } from "https://deno.land/x/frontmatter@v0.1.2/mod.ts";
+
+const markedOpts: marked.MarkedOptions = {
+  highlight: (
+    code: string,
+    lang: string,
+    cb: (err: unknown, result?: string) => void,
+  ) => {
+    (async () => {
+      const proc = Deno.run({
+        cmd: ["node", "twoslash.mjs", lang],
+        stdin: "piped",
+        stdout: "piped",
+        stderr: "piped",
+      });
+      await writeAll(proc.stdin, new TextEncoder().encode(code));
+      proc.stdin.close();
+      const [out, err] = await Promise.all([
+        proc.output(),
+        proc.stderrOutput(),
+      ]);
+      const { success } = await proc.status();
+      if (!success) {
+        return cb!(
+          new Error(new TextDecoder().decode(err)),
+        );
+      }
+      cb!(undefined, new TextDecoder().decode(out));
+    })();
+  },
+};
 
 const collect = async <T>(s: AsyncIterable<T>) => {
   const res = [];
@@ -99,14 +130,15 @@ const fns = {
   ) => {
     const doc = await Deno.readTextFile(`${dir}/${file}`);
     const { data: locals = {}, content } = parse(doc);
-    return marked(
+    return (await marked(
       await useTemplate(
         content,
         { ...data, ...locals as Record<string, string> },
         fns,
         dir,
       ),
-    ).trim();
+      markedOpts,
+    )).trim();
   },
   "?": (str: string, _: string, data: Record<string, string>) => {
     const [x, ...rest] = str.split(":");
@@ -155,6 +187,7 @@ const fns = {
         fns,
         dir,
       ),
+      markedOpts,
     ),
 };
 export const generate = async (input: string, output: string) => {
@@ -192,7 +225,7 @@ export const generate = async (input: string, output: string) => {
               ...globals,
               title,
               ...locals as Record<string, string>,
-              body: marked(content).trim(),
+              body: (await marked(content, markedOpts)).trim(),
             },
             fns,
             templateDir.split("/").pop()?.includes(".")

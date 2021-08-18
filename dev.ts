@@ -11,6 +11,8 @@ if (typeof output !== "string") {
   Deno.exit(1);
 }
 
+import "./install_twoslash.ts";
+
 console.log("rebuilding...");
 await generate(input, output);
 console.log("done!");
