@@ -177,7 +177,7 @@ const fns = {
     marked(
       await useTemplate(
         (await collect(Deno.readDir(`${dir}/${arg}`))).map((d) => d.name)
-          .filter((x) => !x.startsWith("index."))
+          .filter((x) => !x.startsWith("index.") && !x.startsWith("_"))
           .map((d) => {
             const x = d.split(".").slice(0, -1).join(".");
             return `[${x}](${x}/)`;
