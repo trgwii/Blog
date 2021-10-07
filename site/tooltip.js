@@ -1,3 +1,4 @@
+// @license magnet:?xt=urn:btih:5305d91886084f776adcf57509a648432709a7c7&dn=x11.txt X11
 const tooltip = document.createElement("div");
 Object.assign(tooltip.style, {
   position: "absolute",
@@ -30,3 +31,4 @@ for (let i = 0; i < lsps.length; i++) {
     }, 200);
   });
 }
+// @license-end
