@@ -70,10 +70,14 @@ export const writeDocument = async (name: string, data: string) => {
     await Deno.mkdir(name.split("/").slice(0, -1).join("/"), {
       recursive: true,
     });
-    return Deno.writeTextFile(`${name}.html`, data);
+    await Deno.writeTextFile(`${name}.html`, data);
+    await Deno.run({ cmd: ["gzip", "-kf", `${name}.html`] }).status();
+    return;
   }
   await Deno.mkdir(name, { recursive: true });
-  return Deno.writeTextFile(`${name}/index.html`, data);
+  await Deno.writeTextFile(`${name}/index.html`, data);
+  await Deno.run({ cmd: ["gzip", "-kf", `${name}/index.html`] }).status();
+  return;
 };
 
 export const capitalize = (s: string) => s[0].toUpperCase() + s.slice(1);
@@ -264,6 +268,8 @@ export const generate = async (input: string, output: string) => {
           );
           await Deno.mkdir(output, { recursive: true }).catch(() => {});
           await Deno.writeTextFile(`${output}/${name}`, sheet);
+          await Deno.run({ cmd: ["gzip", "-kf", `${output}/${name}`] })
+            .status();
           return;
         }
         await Deno.mkdir(output, { recursive: true }).catch(() => {});
