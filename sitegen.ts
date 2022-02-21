@@ -180,11 +180,26 @@ const fns = {
   dir: async (arg: string, dir: string, data: Record<string, string>) =>
     marked(
       await useTemplate(
-        (await collect(Deno.readDir(`${dir}/${arg}`))).map((d) => d.name)
-          .filter((x) => !x.startsWith("index.") && !x.startsWith("_"))
-          .map((d) => {
-            const x = d.split(".").slice(0, -1).join(".");
-            return `[${x}](${x}/)`;
+        (await Promise.all(
+          (await collect(Deno.readDir(`${dir}/${arg}`))).map((d) => d.name)
+            .filter((x) => !x.startsWith("index.") && !x.startsWith("_"))
+            .map(async (d) => {
+              const x = d.split(".").slice(0, -1).join(".");
+              const { data: fields = {} } = parse(
+                await Deno.readTextFile(`${dir}//${d}`),
+              ) as { data: Record<string, string> };
+              return `${"date" in fields ? (Str(fields.date) + " ") : ""}${
+                "author" in fields ? (fields.author + " ") : ""
+              }[${x}](${x}/)`;
+            }),
+        ))
+          .sort((a, b) => {
+            if (!/\d{4}/.test(a) && !/\d{4}/.test(b)) {
+              return a < b ? -1 : a > b ? 1 : 0;
+            }
+            if (!/\d{4}/.test(a)) return 1;
+            if (!/\d{4}/.test(b)) return -1;
+            return a < b ? 1 : a > b ? -1 : 0;
           })
           .join("\n\n"),
         data,

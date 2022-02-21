@@ -6,23 +6,41 @@ const {
   renderCodeToHTML,
   runTwoSlash,
 } = require("shiki-twoslash");
+const { fetch } = require("undici");
 
 (async () => {
+  const lang = process.argv[2];
   let code = "";
   process.stdin.setEncoding("utf-8");
   for await (const chunk of process.stdin) {
     code += chunk;
   }
   const highlighter = await createShikiHighlighter({ theme: "dark-plus" });
-  const twoslash = runTwoSlash(code, process.argv[2]);
-  const html = renderCodeToHTML(
-    twoslash.code,
-    twoslash.extension,
-    { twoslash: true },
-    {},
-    highlighter,
-    twoslash,
-  );
+  if (lang === "zig") {
+    await highlighter.loadLanguage({
+      id: "zig",
+      scopeName: "source.zig",
+      grammar: JSON.parse(
+        await (await fetch(
+          "https://raw.githubusercontent.com/ziglang/vscode-zig/master/syntaxes/zig.tmLanguage.json",
+        )).text(),
+      ),
+      aliases: ["zig", "ziglang"],
+    });
+  }
+  if (lang === "ts") {
+    const twoslash = runTwoSlash(code, lang);
+    const html = renderCodeToHTML(
+      twoslash.code,
+      twoslash.extension,
+      { twoslash: true },
+      {},
+      highlighter,
+      twoslash,
+    );
 
-  process.stdout.write(html);
+    process.stdout.write(html);
+  } else {
+    console.log(highlighter.codeToHtml(code, lang));
+  }
 })();
