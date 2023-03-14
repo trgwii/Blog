@@ -503,3 +503,57 @@ The actual correct bugfix can be found [here](https://gist.github.com/trgwii/8aa
 > ```
 >
 > Also, it's worth noting that the `assert` statement immediately after the `realloc` call is a good practice to ensure that `realloc` did not fail and return `NULL`. If `realloc` does return `NULL`, the `assert` statement will cause the program to terminate and print an error message.
+>
+> #### You:
+>
+> I found the bug! I keep a pointer to the current snekment in my main loop, and realloc did relocate the memory, causing that pointer to be invalidated.
+>
+> #### ChatGPT:
+>
+> Ah, that makes sense! When you reallocate the `game.snekments` array, it's possible that the memory address of the array changes. If you have a pointer to an element in the array, that pointer may no longer be valid after the reallocation.
+>
+> To fix this, you'll need to make sure that any pointers to elements in the `game.snekments` array are updated after a reallocation. One way to do this is to simply store the index of the current snekment instead of a pointer to it. That way, when you reallocate the `game.snekments` array, the index will still be valid.
+>
+> Here's an example of how you might modify your code to store the index instead of a pointer:
+>
+> ```c
+> int current_snekment = game.sneklen - 1; // Store the index of the last snekment
+> if (new_pos.x == game.foods[j].x && new_pos.y == game.foods[j].y) {
+>   if (j != game.foodlen - 1) {
+>     game.foods[j] = game.foods[game.foodlen - 1];
+>   }
+>   game.foodlen++;
+>   game.points++;
+>   if (game.sneklen >= game.snekcap) {
+>     game.snekcap *= 2;
+>     game.snekments =
+>         realloc(game.snekments, sizeof(Point) * game.snekcap);
+>     assert(game.snekments);
+>     current_snekment = game.sneklen - 1; // Update the index after reallocation
+>   }
+>   game.snekments[game.sneklen] = game.snekments[game.sneklen - 1];
+>   game.sneklen++;
+>   if (rand() % 16 == 0) {
+>     status = "watermelone";
+>   } else {
+>     status = "om nom nom";
+>   }
+>   status_clear = 3;
+> }
+>
+> // Use the index to access the current snekment
+> game.snekments[current_snekment].x = new_pos.x;
+> game.snekments[current_snekment].y = new_pos.y;
+> ```
+>
+> Of course, this is just one way to solve the problem. There may be other ways to update your code to handle reallocations without invalidating pointers.
+>
+> #### You:
+>
+> I just reassigned the pointer after reallocating.
+>
+> #### ChatGPT:
+>
+> Great, reassigning the pointer to the new memory location after `realloc` is usually necessary to avoid issues like the one you experienced. Just make sure to update all relevant pointers that may have been invalidated by the `realloc` call.
+>
+> It's always a good practice to double check your code and make sure that all pointers are pointing to the correct memory location after a call to `realloc`.
