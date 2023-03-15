@@ -3,7 +3,7 @@ author: Thomas
 date: 2023-03-15
 ---
 
-# ChatGPT - 001
+# ChatGPT - 002
 
 Here are my attempts to get ChatGPT to generate a valid Zig program, which it seems to get somewhat close to, but never quite all the way. I don't consider Zig a particularly difficult language to write code in, and I think this is a good demonstration of what happens with chat-based AI when the datasets just aren't large enough.
 
