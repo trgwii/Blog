@@ -26,6 +26,7 @@ const markedOpts: marked.MarkedOptions = {
       ]);
       const { success } = await proc.status();
       if (!success) {
+        console.error(new Error(new TextDecoder().decode(err)));
         return cb!(
           new Error(new TextDecoder().decode(err)),
         );
