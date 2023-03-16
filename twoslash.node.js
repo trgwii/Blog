@@ -6,7 +6,6 @@ const {
   renderCodeToHTML,
   runTwoSlash,
 } = require("shiki-twoslash");
-const { fetch } = require("undici");
 
 (async () => {
   const lang = process.argv[2];
