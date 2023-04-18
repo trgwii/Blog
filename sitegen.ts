@@ -1,16 +1,19 @@
 import { encode } from "https://deno.land/std@0.104.0/encoding/base64.ts";
 import { toFileUrl } from "https://deno.land/std@0.104.0/path/mod.ts";
 import { writeAll } from "https://deno.land/std@0.105.0/io/util.ts";
-import { parse } from "https://deno.land/x/frontmatter@v0.1.2/mod.ts";
+import { parse } from "https://deno.land/x/frontmatter@v0.1.5/mod.ts";
 import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
 
 const markedOpts: marked.MarkedOptions = {
   highlight: (
     code: string,
-    lang: string,
+    lang: string | undefined,
     cb: (err: unknown, result?: string) => void,
   ) => {
+    if (typeof lang === "undefined") {
+      return cb(null, code);
+    }
     (async () => {
       const proc = Deno.run({
         cmd: ["node", "twoslash.node.js", lang],
@@ -116,7 +119,9 @@ export const findGlobals = async (
 export const findTemplate = async (dir: string, name: string) => {
   const dirName = dir.split("/").slice(-1)[0];
   const lower = `${dir}/_${name}.html`;
-  const upper = `${dir}/../_${dirName.slice(0, -1)}.html`;
+  const upper = `${dir}/../_${
+    dirName.endsWith("s") ? dirName.slice(0, -1) : dirName
+  }.html`;
   if (
     await Deno.stat(lower).then(
       (s) => s.isFile,

@@ -45,6 +45,11 @@ img[alt^="16px"] {
 	max-height: 16px;
 }
 
+pre {
+	width: 100%;
+	overflow: auto;
+}
+
 pre > code {
 	font-family: '{codeFont}', monospace;
 	font-size: 14px;
