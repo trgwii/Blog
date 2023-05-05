@@ -37,6 +37,11 @@ In order to properly explain Zig allocators and how to use them, we will need to
 first explain a couple of details about how memory works, if you're comfortable
 with manual memory management, you can [skip this part](#zig).
 
+But before we even do that, we should explain what we mean by allocation
+conceptually.
+
+### What is allocation?
+
 ### Memory pages
 
 The first important detail to know about memory, is that your operating system
