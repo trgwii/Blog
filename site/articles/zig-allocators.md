@@ -52,8 +52,7 @@ Resources on large pages:
 - https://rigtorp.se/hugepages/
 - https://mazzo.li/posts/check-huge-page.html
 - https://pointersgonewild.com/2023/03/12/memory-pages-mmap-and-linear-address-spaces/
-
-- [ ] TODO: Find the "Use large pages for your next project" article / blog post
+- https://www.evanjones.ca/hugepages-are-a-good-idea.html
 
 ### Memory alignment
 
