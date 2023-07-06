@@ -65,21 +65,48 @@ Alignment is in simple terms the concept that certain datatypes should sit
 within addresses that are divisible by a certain minimum size, for example
 `u64`'s should sit in addresses divisible by 8.
 
+The reason for this is that CPU's can optimize better when there are more
+constraints on where in memory words (TODO: ALT TEXT: explain words) can be, and
+many CPU's will simply not work with misaligned data at all. This is also why
+padding exists inside C structs.
+
 ```
 Good:
+[------][------][------][------]
 [------][------][------][------]
 ^       ^       ^       ^
 0       8      16      32
 
 Bad:
+[------][------][------][------]
  [------][------][------][------]
  ^       ^       ^       ^
  1       9      17      33
 ```
 
-### Memory locality and prefetching
-
 ### CPU cachelines
+
+You might have seen code like the following Zig or C:
+
+```zig
+var x: *u8 = ...;
+std.debug.print("{}\n", .{ x.* });
+```
+
+```c
+char *x = ...;
+printf("%d\n", *x);
+```
+
+This code will effectively load a single byte from memory. But this is only a
+half-truth, because CPU's are actually incapable of loading only one byte. For
+every load from main memory, CPU's generally have to load 64 consecutive bytes
+(8x u64's). After that, the entire 64 bytes are cached in L1, L2, L3 caches,
+subsequent loads then consult the cache before resorting to loading from main
+memory. Cache lines also generally exist on 64-byte alignments, so addresses
+0..64, 64..128, etc would each be their own cachelines.
+
+### Memory locality and prefetching
 
 ## Zig
 
