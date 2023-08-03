@@ -27,6 +27,21 @@ pub fn main() !void {
 }
 ```
 
+Another, possibly even better option for you can also be an
+[Arena allocator](#arenaallocator). That looks like this:
+
+```zig
+const std = @import("std");
+	var arena = std.heap.ArenaAllocator(std.heap.page_allocator);
+	defer arena.deinit();
+	const allocator = arena.allocator();
+
+	// Pass allocator to functions that want one
+}
+```
+
+The main utility of this allocator is with short-running programs or functions. This allocator does not generally free any memory until at the very end (when you call `arena.deinit()`). In exchange for this lack of ability, you get much faster allocations, and much less allocator state.
+
 However, if you do want to know more about when to pick which allocator, what
 their differences are, and how to implement your own allocator, you can continue
 reading.
@@ -108,7 +123,11 @@ memory. Cache lines also generally exist on 64-byte alignments, so addresses
 
 ### Memory locality and prefetching
 
+TODO: Maybe cut this?
+
 ## Zig
+
+...
 
 ### FixedBufferAllocator
 
@@ -123,3 +142,5 @@ memory. Cache lines also generally exist on 64-byte alignments, so addresses
 ### CAllocator
 
 ### StackFallbackAllocator
+
+## Making your own allocator
