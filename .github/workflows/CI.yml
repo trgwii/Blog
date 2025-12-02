@@ -12,4 +12,4 @@ jobs:
         with:
           fetch-depth: 1
       - name: Test
-        run: npx deno sitegen.ts site dist
+        run: npx deno -A sitegen.ts site dist
