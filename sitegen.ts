@@ -29,7 +29,7 @@ const markedOpts: marked.MarkedOptions = {
       const proc = command.spawn();
       const writer = proc.stdin.getWriter();
       await writer.write(new TextEncoder().encode(code));
-      await writer.close();
+      await writer.close().catch(() => void 0);
       const { stdout, stderr } = await proc.output();
       const { success } = await proc.status;
       if (!success) {
