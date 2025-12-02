@@ -4,6 +4,17 @@ import { parse } from "https://deno.land/x/frontmatter@v0.1.5/mod.ts";
 import marked from "./marked.ts";
 import { replaceAsync } from "./replaceAsync.ts";
 
+const hasLocalStorage = await (async () => {
+  const node_version = new TextDecoder().decode(
+    (await new Deno.Command("node", { args: ["-v"] }).output()).stdout,
+  );
+  const m = node_version.match(/v(\d+)\.(\d+)\.(\d+)/);
+  if (m == null) throw new Error("Can't get node version");
+  const [, major, minor, patch] = m;
+  void patch;
+  return Number(major) > 22 || (Number(major) === 22 && (Number(minor) >= 4));
+})();
+
 const markedOpts: marked.MarkedOptions = {
   highlight: (
     code: string,
@@ -17,8 +28,7 @@ const markedOpts: marked.MarkedOptions = {
       await Deno.mkdir("tmp", { recursive: true });
       const command = new Deno.Command("node", {
         args: [
-          "--localstorage-file",
-          "tmp/localStorage",
+          ...hasLocalStorage ? ["--localstorage-file", "tmp/localStorage"] : [],
           "twoslash.node.js",
           lang,
         ],
