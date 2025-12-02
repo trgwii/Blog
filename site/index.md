@@ -1,3 +1,7 @@
+---
+DESCRIPTION: Welcome to Thomas's site
+---
+
 # Welcome
 
 {md:_nav.md}

@@ -1,63 +1,63 @@
 :root {
-	/* Variables */
-	--dark: #181a1b;
-	--gray: #736b5e;
-	--light: #e8e6e3;
+  /* Variables */
+  --dark: #181a1b;
+  --gray: #736b5e;
+  --light: #e8e6e3;
 }
 
 /* Global rules */
 html, body, input, textarea, select, button {
-	background: var(--dark) !important;
-	color: var(--light) !important;
-	border-color: var(--gray) !important;
-	font-family: '{bodyFont}', Verdana, Geneva, sans-serif;
+  background: var(--dark) !important;
+  color: var(--light) !important;
+  border-color: var(--gray) !important;
+  font-family: "{bodyFont}", Verdana, Geneva, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: '{titleFont}', Verdana, Geneva, sans-serif;
+  font-family: "{titleFont}", Verdana, Geneva, sans-serif;
 }
 a {
-	color: var(--light) !important;
+  color: var(--light) !important;
 }
 
 @media (prefers-color-scheme: light) {
-	html, body, input, textarea, select, button {
-		background: var(--light) !important;
-		color: var(--dark) !important;
-	}
+  html, body, input, textarea, select, button {
+    background: var(--light) !important;
+    color: var(--dark) !important;
+  }
 
-	a {
-		color: var(--dark) !important;
-	}
+  a {
+    color: var(--dark) !important;
+  }
 }
 
 body {
-	margin: 30px auto;
-	max-width: 1200px;
+  margin: 30px auto;
+  max-width: 1200px;
 }
 
 main {
-	margin: auto 30px;
+  margin: auto 30px;
 }
 
 img[alt^="16px"] {
-	max-width: 16px;
-	max-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
 }
 
 pre {
-	overflow: auto;
+  overflow: auto;
 }
 
 pre > code {
-	font-family: '{codeFont}', monospace;
-	font-size: 14px;
+  font-family: "{codeFont}", monospace;
+  font-size: 14px;
 }
 
 data-lsp {
-	border-bottom: 1px dotted #D4D4D4;
+  border-bottom: 1px dotted #d4d4d4;
 }
 
 .language-id {
-	display: none;
+  display: none;
 }

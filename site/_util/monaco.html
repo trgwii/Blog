@@ -1,27 +1,27 @@
 <script src="/vs/loader.js"></script>
 <script>
-	require.config({
-		baseUrl: "/"
-	});
-	require(["vs/editor/editor.main"], function () {
-		var editors = document.querySelectorAll('pre > code');
-		for (var i = 0; i < editors.length; i++) {
-			var el = editors[i];
-			var text = el.textContent.trim() + '\n';
-			var lines = text.split('\n').length;
-			el.parentElement.style.height = `${lines * 19 + (10 * 19)}px`;
-			el.parentElement.style.margin = 'auto 20px';
+  require.config({
+    baseUrl: "/",
+  });
+  require(["vs/editor/editor.main"], function () {
+    var editors = document.querySelectorAll("pre > code");
+    for (var i = 0; i < editors.length; i++) {
+      var el = editors[i];
+      var text = el.textContent.trim() + "\n";
+      var lines = text.split("\n").length;
+      el.parentElement.style.height = `${lines * 19 + (10 * 19)}px`;
+      el.parentElement.style.margin = "auto 20px";
 
-			var lang = el.getAttribute('class').split('-')[1];
-			var editor = monaco.editor.create(el.parentElement, {
-				renderWhitespace: "all",
-				theme: "vs-dark",
-				wordWrap: "on"
-			});
-			addEventListener('resize', () => editor.layout());
-			el.remove();
-			editor.setValue(text);
-			monaco.editor.setModelLanguage(editor.getModel(), lang);
-		}
-	});
+      var lang = el.getAttribute("class").split("-")[1];
+      var editor = monaco.editor.create(el.parentElement, {
+        renderWhitespace: "all",
+        theme: "vs-dark",
+        wordWrap: "on",
+      });
+      addEventListener("resize", () => editor.layout());
+      el.remove();
+      editor.setValue(text);
+      monaco.editor.setModelLanguage(editor.getModel(), lang);
+    }
+  });
 </script>

@@ -10,7 +10,7 @@ export const bodyFontWeight = 400;
 export const bodyFontSlug = bodyFont.replaceAll(" ", "+") +
   (bodyFontWeight === 400 ? "" : `:wght@${bodyFontWeight}`);
 
-export const codeFont = 'Inconsolata';
+export const codeFont = "Inconsolata";
 export const codeFontWeight = 400;
 export const codeFontSlug = codeFont.replaceAll(" ", "+") +
   (codeFontWeight === 400 ? "" : `:wght@${codeFontWeight}`);

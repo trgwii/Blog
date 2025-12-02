@@ -40,7 +40,10 @@ const std = @import("std");
 }
 ```
 
-The main utility of this allocator is with short-running programs or functions. This allocator does not generally free any memory until at the very end (when you call `arena.deinit()`). In exchange for this lack of ability, you get much faster allocations, and much less allocator state.
+The main utility of this allocator is with short-running programs or functions.
+This allocator does not generally free any memory until at the very end (when
+you call `arena.deinit()`). In exchange for this lack of ability, you get much
+faster allocations, and much less allocator state.
 
 However, if you do want to know more about when to pick which allocator, what
 their differences are, and how to implement your own allocator, you can continue

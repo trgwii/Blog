@@ -2,23 +2,24 @@
 <script src="/cm/codemirror.js"></script>
 <script src="/cm/mode/javascript/javascript.js"></script>
 <script>
-	var editors = document.querySelectorAll('pre > code');
-	for (var i = 0; i < editors.length; i++) {
-		var el = editors[i];
-		var text = el.textContent.trim() + '\n';
-		var lang = el.getAttribute('class').split('-')[1];
-		var textarea = document.createElement('textarea');
-		var mode =
-			lang === 'typescript' ? { name: 'javascript', typescript: true } :
-			lang === 'json' ? { name: 'javascript', json: true } :
-			lang;
-		textarea.textContent = text;
-		el.parentElement.appendChild(textarea)
-		el.remove();
-		var editor = CodeMirror.fromTextArea(textarea, {
-			lineNumbers: true,
-			mode: mode,
-			theme: "default"
-		});
-	}
+  var editors = document.querySelectorAll("pre > code");
+  for (var i = 0; i < editors.length; i++) {
+    var el = editors[i];
+    var text = el.textContent.trim() + "\n";
+    var lang = el.getAttribute("class").split("-")[1];
+    var textarea = document.createElement("textarea");
+    var mode = lang === "typescript"
+      ? { name: "javascript", typescript: true }
+      : lang === "json"
+      ? { name: "javascript", json: true }
+      : lang;
+    textarea.textContent = text;
+    el.parentElement.appendChild(textarea);
+    el.remove();
+    var editor = CodeMirror.fromTextArea(textarea, {
+      lineNumbers: true,
+      mode: mode,
+      theme: "default",
+    });
+  }
 </script>

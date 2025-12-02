@@ -1,16 +1,16 @@
 <script src="https://pagecdn.io/lib/ace/1.4.12/ace.js"></script>
 <script>
-	var editors = document.querySelectorAll('pre > code');
-	for (var i = 0; i < editors.length; i++) {
-		var el = editors[i];
-		console.log(el, el.parentElement);
-		var text = el.textContent.trim() + '\n';
-		var lang = el.getAttribute('class').split('-')[1];
-		var lines = text.split('\n').length;
-		el.parentElement.style.height = `${lines * 14 + (5 * 14)}px`;
-		el.parentElement.style.margin = 'auto 20px';
-		var editor = ace.edit(el.parentElement);
-		editor.setTheme("ace/theme/monokai");
-		editor.session.setMode("ace/mode/" + lang);
-	}
+  var editors = document.querySelectorAll("pre > code");
+  for (var i = 0; i < editors.length; i++) {
+    var el = editors[i];
+    console.log(el, el.parentElement);
+    var text = el.textContent.trim() + "\n";
+    var lang = el.getAttribute("class").split("-")[1];
+    var lines = text.split("\n").length;
+    el.parentElement.style.height = `${lines * 14 + (5 * 14)}px`;
+    el.parentElement.style.margin = "auto 20px";
+    var editor = ace.edit(el.parentElement);
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/" + lang);
+  }
 </script>
