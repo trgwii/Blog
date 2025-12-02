@@ -11,5 +11,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Install dependencies
+        run: npx deno -A install_twoslash.ts
       - name: Test
         run: npx deno -A sitegen.ts site dist

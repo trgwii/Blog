@@ -1,9 +1,7 @@
-await Deno.run({
-  cmd: [
-    ...Deno.build.os === "windows" ? ["cmd.exe", "/c"] : [],
-    "npm",
+await new Deno.Command("npm", {
+  args: [
     "i",
     "shiki-twoslash",
     "undici",
   ],
-}).status();
+}).spawn().status;
